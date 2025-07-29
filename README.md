@@ -30,7 +30,7 @@
 ✨ Capturas
 <img width="921" height="574" alt="image" src="https://github.com/user-attachments/assets/c075da3d-9f9e-4f27-952d-f28a71227252" />
 
-<img width="921" height="574" alt="image" src="https://github.com/user-attachments/assets/1d7efc3a-a045-46f6-98b4-3227aefb331b" />
+<img width="921" height="574" alt="image" src="https://github.com/user-attachments/assets/35b042b0-a3e1-4461-8afc-fba2f2abe35f" />
 
 <img width="921" height="574" alt="image" src="https://github.com/user-attachments/assets/8c0754d4-9f6e-46ce-a767-4ad8ec99bce5" />
 
