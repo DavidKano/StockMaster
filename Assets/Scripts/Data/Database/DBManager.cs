@@ -1,8 +1,8 @@
 using UnityEngine;
 using SQLite4Unity3d;
 using System.IO;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 public class DBManager
 {
@@ -16,9 +16,12 @@ public class DBManager
         db = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
         db.CreateTable<Usuario>();
         db.CreateTable<Entrada>();
+        db.CreateTable<Salida>();
 
         Debug.Log("Base de datos inicializada en: " + dbPath);
     }
+
+    // ──────────────── Usuarios ────────────────
 
     public static void RegistrarUsuario(Usuario usuario)
     {
@@ -44,6 +47,8 @@ public class DBManager
         return db.Find<Usuario>(dni);
     }
 
+    // ──────────────── Entradas ────────────────
+
     public static List<Entrada> ObtenerEntradas()
     {
         return db.Table<Entrada>().ToList();
@@ -51,15 +56,8 @@ public class DBManager
 
     public static void InsertarEntrada(Entrada entrada)
     {
-        if (db != null)
-        {
-            db.Insert(entrada);
-            Debug.Log("Entrada insertada correctamente en la base de datos.");
-        }
-        else
-        {
-            Debug.LogError("La base de datos no está inicializada.");
-        }
+        db.Insert(entrada);
+        Debug.Log("Entrada insertada correctamente en la base de datos.");
     }
 
     public static void EliminarEntrada(int id)
@@ -70,16 +68,61 @@ public class DBManager
 
     public static void ActualizarEntrada(Entrada entrada)
     {
-        if (db == null) return;
-
         db.Update(entrada);
         Debug.Log("Entrada actualizada correctamente: " + entrada.id);
     }
 
+    // ──────────────── Salidas ────────────────
 
+    public static void InsertarSalida(Salida salida)
+    {
+        db.Insert(salida);
+        
+    }
 
+    public static void ActualizarSalida(Salida salida)
+    {
+        db.Update(salida);
+    }
 
+    public static void EliminarSalida(int id)
+    {
+        db.Delete<Salida>(id);
+    }
 
+    public static List<Salida> ObtenerSalidas()
+    {
+        return db.Table<Salida>().ToList();
+    }
 
+    // ──────────────── Artículos y Ubicaciones ────────────────
 
+    public static List<string> ObtenerArticulos()
+    {
+        return db.Query<Entrada>("SELECT DISTINCT articulo FROM Entrada")
+                 .Select(e => e.articulo)
+                 .ToList();
+    }
+
+    public static List<string> ObtenerUbicacionesDeArticulo(string articulo)
+    {
+        return db.Query<Entrada>("SELECT DISTINCT ubicacion FROM Entrada WHERE articulo = ?", articulo)
+                 .Select(e => e.ubicacion)
+                 .ToList();
+    }
+
+    // ──────────────── Stock lógico ────────────────
+
+    public static int CalcularStock(string articulo, string ubicacion)
+    {
+        int totalEntradas = db.Table<Entrada>()
+            .Where(e => e.articulo == articulo && e.ubicacion == ubicacion)
+            .Sum(e => int.TryParse(e.cantidad, out var n) ? n : 0);
+
+        int totalSalidas = db.Table<Salida>()
+            .Where(s => s.articulo == articulo && s.ubicacion == ubicacion)
+            .Sum(s => int.TryParse(s.cantidad, out var n) ? n : 0);
+
+        return totalEntradas - totalSalidas;
+    }
 }

@@ -22,7 +22,7 @@ public class MainUI : MonoBehaviour
         // Cargar nombre desde DB según DNI guardado en PlayerPrefs
         string dniGuardado = PlayerPrefs.GetString("dni", "");
         Usuario usuario = DBManager.ObtenerUsuario(dniGuardado);
-        
+
         if (usuario != null)
         {
             textoUsuario.text = "Bienvenido/a, " + usuario.nombre + " " + usuario.apellidos;
@@ -57,4 +57,6 @@ public class MainUI : MonoBehaviour
         PlayerPrefs.DeleteKey("dni"); // Borra el usuario actual
         SceneManager.LoadScene(0); // Carga la escena del login
     }
+    
+
 }
