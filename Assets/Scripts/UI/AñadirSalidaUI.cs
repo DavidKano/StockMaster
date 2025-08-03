@@ -27,7 +27,8 @@ public class AñadirSalidaUI : MonoBehaviour
     void Start()
     {
         btnGuardar.onClick.AddListener(GuardarSalida);
-        btnCancelar.onClick.AddListener(() => panel2.SetActive(false));
+        //btnCancelar.onClick.AddListener(() => panel2.SetActive(false));
+        btnCancelar.onClick.AddListener(Cancelar);
         inputDropdownArticulo.onValueChanged.AddListener(delegate { ActualizarUbicaciones(); });
         //MostrarSalidas(); // carga todas las salidas al iniciar
 
@@ -148,9 +149,17 @@ public class AñadirSalidaUI : MonoBehaviour
     {
         panel2.SetActive(false);
     }
-    
 
+    private void Cancelar()
+    {
+        this.gameObject.SetActive(false);  // Oculta el panel actual de salida
+        panel2.SetActive(false);           // Oculta el panel visual padre si hace falta
 
-
+        if (panelAñadirEntrada.activeSelf)
+        {
+            Debug.LogWarning("Panel de entrada estaba activo al cancelar. Lo cerramos.");
+            panelAñadirEntrada.SetActive(false);
+        }
+    }
 
 }

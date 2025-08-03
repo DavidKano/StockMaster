@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 
+
 public class DBManager
 {
     private static SQLiteConnection db;
@@ -77,7 +78,7 @@ public class DBManager
     public static void InsertarSalida(Salida salida)
     {
         db.Insert(salida);
-        
+
     }
 
     public static void ActualizarSalida(Salida salida)
@@ -125,4 +126,34 @@ public class DBManager
 
         return totalEntradas - totalSalidas;
     }
+
+    // ──────────────── Stock ────────────────
+
+    public static List<StockItem> ObtenerStockActual()
+    {
+        string consulta = @"
+        SELECT articulo, ubicacion, SUM(cantidad) as cantidad
+        FROM (
+            SELECT articulo, ubicacion, cantidad FROM Entrada
+            UNION ALL
+            SELECT articulo, ubicacion, -cantidad FROM Salida
+        )
+        GROUP BY articulo, ubicacion
+        ORDER BY articulo, ubicacion
+    ";
+
+        return db.Query<StockItem>(consulta);
+    }
+
+
+    public class StockItem
+{
+    public string articulo { get; set; }
+    public string ubicacion { get; set; }
+    public int cantidad { get; set; }
+}
+
+   
+
+
 }
