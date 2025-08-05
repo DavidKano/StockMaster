@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 
+
 public class DBManager
 {
     private static SQLiteConnection db;
@@ -77,7 +78,7 @@ public class DBManager
     public static void InsertarSalida(Salida salida)
     {
         db.Insert(salida);
-        
+
     }
 
     public static void ActualizarSalida(Salida salida)
@@ -125,4 +126,70 @@ public class DBManager
 
         return totalEntradas - totalSalidas;
     }
+
+    // ──────────────── Stock ────────────────
+
+    public static List<StockItem> ObtenerStockActual()
+    {
+        string consulta = @"
+        SELECT articulo, ubicacion, SUM(cantidad) as cantidad
+        FROM (
+            SELECT articulo, ubicacion, cantidad FROM Entrada
+            UNION ALL
+            SELECT articulo, ubicacion, -cantidad FROM Salida
+        )
+        GROUP BY articulo, ubicacion
+        ORDER BY articulo, ubicacion
+    ";
+
+        return db.Query<StockItem>(consulta);
+    }
+
+
+    public class StockItem
+    {
+        public string articulo { get; set; }
+        public string ubicacion { get; set; }
+        public int cantidad { get; set; }
+    }
+
+    // ──────────────── Historial ────────────────
+
+    public static List<HistorialItem> ObtenerHistorial()
+    {
+        // Ordena dd/MM/yyyy como yyyymmdd para poder ORDER DESC
+        const string conv = "CAST(substr(fecha,7,4) || substr(fecha,4,2) || substr(fecha,1,2) AS INTEGER)";
+
+        string sql = $@"
+        SELECT 'Entrada' as tipo,
+               articulo,
+               ubicacion,
+               CAST(cantidad AS INTEGER) as cantidad,
+               proveedor as actor,
+               fecha,
+               {conv} as fecha_orden
+        FROM Entrada
+        UNION ALL
+        SELECT 'Salida' as tipo,
+               articulo,
+               ubicacion,
+               -CAST(cantidad AS INTEGER) as cantidad,
+               persona as actor,
+               fecha,
+               {conv} as fecha_orden
+        FROM Salida
+        ORDER BY fecha_orden DESC
+    ";
+
+        return db.Query<HistorialItem>(sql);
+    }
+
+    // ──────────────── Backup ────────────────
+
+    public static void Close() { db?.Close(); db = null; }
+
+
+
+
+
 }
