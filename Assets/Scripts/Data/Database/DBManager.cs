@@ -154,13 +154,13 @@ public class DBManager
     }
 
     // ──────────────── Historial ────────────────
-   
-   public static List<HistorialItem> ObtenerHistorial()
-{
-    // Ordena dd/MM/yyyy como yyyymmdd para poder ORDER DESC
-    const string conv = "CAST(substr(fecha,7,4) || substr(fecha,4,2) || substr(fecha,1,2) AS INTEGER)";
 
-    string sql = $@"
+    public static List<HistorialItem> ObtenerHistorial()
+    {
+        // Ordena dd/MM/yyyy como yyyymmdd para poder ORDER DESC
+        const string conv = "CAST(substr(fecha,7,4) || substr(fecha,4,2) || substr(fecha,1,2) AS INTEGER)";
+
+        string sql = $@"
         SELECT 'Entrada' as tipo,
                articulo,
                ubicacion,
@@ -181,8 +181,13 @@ public class DBManager
         ORDER BY fecha_orden DESC
     ";
 
-    return db.Query<HistorialItem>(sql);
-}
+        return db.Query<HistorialItem>(sql);
+    }
+
+    // ──────────────── Backup ────────────────
+
+    public static void Close() { db?.Close(); db = null; }
+
 
 
 
